@@ -39,14 +39,18 @@ function fetchRegisteredUsers() {
         const usernameCell = newRow.insertCell(0);
         const emailCell = newRow.insertCell(1);
         const passwordCell = newRow.insertCell(2);
-        const registrationDateCell = newRow.insertCell(3);
-        const registrationTimeCell = newRow.insertCell(4);
+        const departmentCell = newRow.insertCell(3);
+        const registrationDateCell = newRow.insertCell(4);
+        const registrationTimeCell = newRow.insertCell(5);
+        const actionCell = newRow.insertCell(6);
 
         usernameCell.textContent = user.username;
         emailCell.textContent = user.email;
         passwordCell.textContent = user.password;
+        departmentCell.textContent = user.department;
         registrationDateCell.textContent = user.registrationDate;
         registrationTimeCell.textContent = user.registrationTime;
+        actionCell.innerHTML = `<button class="btn" onclick="removeUser('${user.username}')">Remove</button>`;
     });
 }
 
@@ -75,6 +79,15 @@ function fetchCurrentUserAttendance() {
         timeCell.textContent = record.time;
         statusCell.textContent = record.status;
     });
+}
+
+function removeUser(username) {
+    // Retrieve the registered users data from localStorage
+    let registeredUsers = JSON.parse(localStorage.getItem('registeredUsers')) || [];
+    registeredUsers = registeredUsers.filter(user => user.username !== username);
+
+    localStorage.setItem('registeredUsers', JSON.stringify(registeredUsers));
+    fetchRegisteredUsers(); // Refresh the registered users table
 }
 
 function getUsernameFromSession() {
