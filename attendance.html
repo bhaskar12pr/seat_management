@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attendance</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 80%;
+            margin: auto;
+            overflow: hidden;
+        }
+        h1, h2 {
+            text-align: center;
+            color: #333;
+        }
+        .attendance-entry, .attendance-report {
+            background: #fff;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        input[type="date"], input[type="radio"] {
+            margin-bottom: 10px;
+        }
+        button {
+            display: inline-block;
+            padding: 10px 20px;
+            font-size: 16px;
+            color: #fff;
+            background-color: #007BFF;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #007BFF;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Mark Attendance</h1>
+        <div id="attendance-entries" class="attendance-entry">
+            <div class="attendance-entry">
+                <label for="attendance-start-date">Select Start Date:</label>
+                <input type="date" id="attendance-start-date" class="attendance-date">
+                <br>
+                <label for="attendance-end-date">Select End Date:</label>
+                <input type="date" id="attendance-end-date" class="attendance-date">
+                <br>
+                <label for="attendance-status">Select Status:</label>
+                <input type="radio" class="attendance-status" name="attendance-status" value="Present" checked>
+                <label for="present">Present</label>
+                <input type="radio" class="attendance-status" name="attendance-status" value="Absent">
+                <label for="absent">Absent</label>
+                <br>
+                <button onclick="markAttendance()">Mark Attendance</button>
+            </div>
+        </div>
+
+        <h2>Your Attendance Report</h2>
+        <div class="attendance-report">
+            <table id="user-attendance-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Entry Time</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Attendance data will be inserted here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <script src="js/attendance-scripts.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const username = sessionStorage.getItem('username');
+            if (username) {
+                document.title = `Attendance - ${username}`;
+            }
+        });
+    </script>
+</body>
+</html>
