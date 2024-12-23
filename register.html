@@ -3,48 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Registration</title>
+    <title>Register</title>
     <link rel="stylesheet" href="css/styles.css">
     <style>
         body {
             font-family: 'Arial', sans-serif;
-            background-color: #f4f4f4;
+            background: #2c2c2c; /* Light black background */
+            margin: 0;
+            padding: 0;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
-            margin: 0;
+            color: #fff;
         }
-        .register-container {
-            background: #fff;
-            padding: 40px;
+        .registration-container {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
             border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            animation: fadeIn 1s ease-in-out;
             width: 100%;
             max-width: 400px;
             text-align: center;
         }
-        .register-container h1 {
-            margin-bottom: 20px;
+        h1 {
+            text-align: center;
             color: #333;
+            animation: slideIn 1s ease-in-out;
+            margin-bottom: 20px;
         }
-        .register-container label {
+        label {
             display: block;
-            margin-bottom: 5px;
+            margin-bottom: 10px;
             font-weight: bold;
+            color: #333;
             text-align: left;
         }
-        .register-container input[type="text"],
-        .register-container input[type="email"],
-        .register-container input[type="password"],
-        .register-container select {
+        input[type="text"], input[type="password"], input[type="email"] {
             width: 100%;
             padding: 10px;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
             border: 1px solid #ddd;
             border-radius: 5px;
+            animation: fadeIn 1s ease-in-out;
         }
-        .register-container button {
+        button {
+            display: inline-block;
             width: 100%;
             padding: 10px;
             font-size: 16px;
@@ -53,22 +58,34 @@
             border: none;
             border-radius: 5px;
             cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            animation: fadeIn 1s ease-in-out;
         }
-        .register-container button:hover {
+        button:hover {
             background-color: #0056b3;
+            transform: translateY(-2px);
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes slideIn {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
         }
     </style>
 </head>
 <body>
-    <div class="register-container">
+    <div class="registration-container">
         <h1>Register</h1>
         <form id="register-form" onsubmit="registerUser(event)">
-            <label for="register-username">Username:</label>
-            <input type="text" id="register-username" name="username" required>
-            <label for="register-email">Email:</label>
-            <input type="email" id="register-email" name="email" required>
-            <label for="register-password">Password:</label>
-            <input type="password" id="register-password" name="password" required>
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" required>
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required>
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required>
             <label for="register-department">Department:</label>
             <select id="register-department" name="department" required>
                 <option value="">Select Department</option>

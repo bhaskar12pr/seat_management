@@ -3,46 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Login</title>
+    <title>Login</title>
     <link rel="stylesheet" href="css/styles.css">
     <style>
         body {
             font-family: 'Arial', sans-serif;
-            background-color: #f4f4f4;
+            background: #2c2c2c; /* Light black background */
+            margin: 0;
+            padding: 0;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
-            margin: 0;
+            color: #fff;
         }
         .login-container {
-            background: #fff;
-            padding: 40px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
             border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            animation: fadeIn 1s ease-in-out;
             width: 100%;
             max-width: 400px;
             text-align: center;
         }
-        .login-container h1 {
-            margin-bottom: 20px;
+        h1 {
+            text-align: center;
             color: #333;
+            animation: slideIn 1s ease-in-out;
+            margin-bottom: 20px;
         }
-        .login-container label {
+        label {
             display: block;
-            margin-bottom: 5px;
+            margin-bottom: 10px;
             font-weight: bold;
+            color: #333;
             text-align: left;
         }
-        .login-container input[type="text"],
-        .login-container input[type="password"] {
+        input[type="text"], input[type="password"] {
             width: 100%;
             padding: 10px;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
             border: 1px solid #ddd;
             border-radius: 5px;
+            animation: fadeIn 1s ease-in-out;
         }
-        .login-container button {
+        button {
+            display: inline-block;
             width: 100%;
             padding: 10px;
             font-size: 16px;
@@ -51,9 +58,21 @@
             border: none;
             border-radius: 5px;
             cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            animation: fadeIn 1s ease-in-out;
         }
-        .login-container button:hover {
+        button:hover {
             background-color: #0056b3;
+            transform: translateY(-2px);
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes slideIn {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
         }
         .register-link {
             margin-top: 20px;

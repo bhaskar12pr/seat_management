@@ -36,9 +36,15 @@ function markAttendance() {
     const startDateInput = document.getElementById('attendance-start-date').value;
     const endDateInput = document.getElementById('attendance-end-date').value;
     const statusInput = document.querySelector('input[name="attendance-status"]:checked').value;
+    const selectedSeat = document.querySelector('.seat.selected');
 
     if (!startDateInput || !endDateInput) {
         alert('Please select both start and end dates');
+        return;
+    }
+
+    if (!selectedSeat) {
+        alert('Please select a seat');
         return;
     }
 
@@ -55,6 +61,13 @@ function markAttendance() {
     for (let date = new Date(startDate); date <= endDate; date.setDate(date.getDate() + 1)) {
         const dateString = date.toISOString().split('T')[0];
 
+        // Check if the seat is already taken for the selected date
+        const seatTaken = attendanceRecords.some(record => record.date === dateString && record.seat === selectedSeat.getAttribute('data-seat-number'));
+        if (seatTaken) {
+            alert(`Seat ${selectedSeat.getAttribute('data-seat-number')} is already taken for ${dateString}`);
+            continue;
+        }
+
         // Check if the attendance for the selected date already exists
         const attendanceExists = attendanceRecords.some(record => record.username === username && record.date === dateString);
         if (attendanceExists) {
@@ -69,7 +82,8 @@ function markAttendance() {
             username: username,
             date: dateString,
             time: time,
-            status: statusInput
+            status: statusInput,
+            seat: selectedSeat.getAttribute('data-seat-number')
         };
 
         attendanceRecords.push(attendanceData);
@@ -77,6 +91,7 @@ function markAttendance() {
 
     localStorage.setItem('attendanceRecords', JSON.stringify(attendanceRecords));
     fetchAttendanceReport(); // Refresh the attendance report
+    updateSeatMap(); // Update the seat map to reflect the new assignments
 }
 
 function fetchAttendanceReport() {
@@ -99,11 +114,13 @@ function fetchAttendanceReport() {
         const dateCell = newRow.insertCell(0);
         const timeCell = newRow.insertCell(1);
         const statusCell = newRow.insertCell(2);
-        const removeCell = newRow.insertCell(3);
+        const seatCell = newRow.insertCell(3);
+        const removeCell = newRow.insertCell(4);
 
         dateCell.textContent = record.date;
         timeCell.textContent = record.time;
         statusCell.textContent = record.status;
+        seatCell.textContent = record.seat;
         removeCell.innerHTML = `<button onclick="removeAttendance('${record.date}')">Remove</button>`;
     });
 }
@@ -121,11 +138,131 @@ function removeAttendance(date) {
 
     localStorage.setItem('attendanceRecords', JSON.stringify(attendanceRecords));
     fetchAttendanceReport(); // Refresh the attendance report
+    updateSeatMap(); // Update the seat map to reflect the removed assignments
 }
 
 function getUsernameFromSession() {
     return sessionStorage.getItem('username'); // Retrieve the username from sessionStorage
 }
 
-// Fetch the attendance report when the page loads
-document.addEventListener('DOMContentLoaded', fetchAttendanceReport);
+document.addEventListener('DOMContentLoaded', () => {
+    generateSeatMap();
+    fetchAttendanceReport();
+});
+
+function generateSeatMap() {
+    const seatMap = document.getElementById('seat-map');
+    const totalRows = 8;
+    const seatsPerRow = 10;
+
+    // Clear any existing seats
+    seatMap.innerHTML = '';
+
+    let seatCounter = 1;
+
+    for (let row = 1; row <= totalRows; row++) {
+        const rowDiv = document.createElement('div');
+        rowDiv.classList.add('seat-row');
+
+        if (row === 1) {
+            // First row: only seats 1, 2, 3
+            for (let seatNumber = 1; seatNumber <= 3; seatNumber++) {
+                const seat = document.createElement('div');
+                seat.classList.add('seat', 'default');
+                seat.setAttribute('data-seat-number', seatCounter++);
+                seat.addEventListener('click', () => selectSeat(seat));
+                rowDiv.appendChild(seat);
+            }
+            // Fill the rest of the row with empty spaces
+            for (let i = 4; i <= seatsPerRow; i++) {
+                const emptySpace = document.createElement('div');
+                emptySpace.classList.add('seat-empty');
+                rowDiv.appendChild(emptySpace);
+            }
+        } else if (row === 2) {
+            // Second row: only seats 4, 5
+            for (let seatNumber = 4; seatNumber <= 5; seatNumber++) {
+                const seat = document.createElement('div');
+                seat.classList.add('seat', 'default');
+                seat.setAttribute('data-seat-number', seatCounter++);
+                seat.addEventListener('click', () => selectSeat(seat));
+                rowDiv.appendChild(seat);
+            }
+            // Fill the rest of the row with empty spaces
+            for (let i = 6; i <= seatsPerRow; i++) {
+                const emptySpace = document.createElement('div');
+                emptySpace.classList.add('seat-empty');
+                rowDiv.appendChild(emptySpace);
+            }
+        } else {
+            // Remaining rows: first column with 4 seats, second column with 5 seats
+            for (let seatNumber = 1; seatNumber <= 4; seatNumber++) {
+                const seat = document.createElement('div');
+                seat.classList.add('seat', 'default');
+                seat.setAttribute('data-seat-number', seatCounter++);
+                seat.addEventListener('click', () => selectSeat(seat));
+                rowDiv.appendChild(seat);
+            }
+            const gap = document.createElement('div');
+            gap.classList.add('seat-gap');
+            rowDiv.appendChild(gap);
+            for (let seatNumber = 5; seatNumber <= 9; seatNumber++) {
+                const seat = document.createElement('div');
+                seat.classList.add('seat', 'default');
+                seat.setAttribute('data-seat-number', seatCounter++);
+                seat.addEventListener('click', () => selectSeat(seat));
+                rowDiv.appendChild(seat);
+            }
+        }
+        seatMap.appendChild(rowDiv);
+    }
+    updateSeatMap();
+}
+
+function selectSeat(seat) {
+    if (seat.classList.contains('taken')) {
+        alert('This seat is already taken.');
+        return;
+    }
+    const selectedSeat = document.querySelector('.seat.selected');
+    if (selectedSeat) {
+        selectedSeat.classList.remove('selected');
+        selectedSeat.classList.add('default');
+    }
+    seat.classList.remove('default');
+    seat.classList.add('selected');
+}
+
+function updateSeatMap() {
+    const startDateInput = document.getElementById('attendance-start-date').value;
+    const endDateInput = document.getElementById('attendance-end-date').value;
+    const startDate = new Date(startDateInput);
+    const endDate = new Date(endDateInput);
+
+    if (!startDateInput || !endDateInput || startDate > endDate) {
+        return;
+    }
+
+    let attendanceRecords = JSON.parse(localStorage.getItem('attendanceRecords')) || [];
+    const seats = document.querySelectorAll('.seat');
+
+    seats.forEach(seat => {
+        seat.classList.remove('taken');
+        seat.classList.add('default');
+        seat.removeAttribute('data-username');
+        for (let date = new Date(startDate); date <= endDate; date.setDate(date.getDate() + 1)) {
+            const dateString = date.toISOString().split('T')[0];
+            const record = attendanceRecords.find(record => record.date === dateString && record.seat === seat.getAttribute('data-seat-number'));
+            if (record) {
+                seat.classList.remove('default');
+                seat.classList.add('taken');
+                seat.setAttribute('data-username', `Taken by ${record.username}`);
+                break;
+            }
+        }
+    });
+}
+
+// Update the seat map when the date inputs change
+document.getElementById('attendance-start-date').addEventListener('change', updateSeatMap);
+document.getElementById('attendance-end-date').addEventListener('change', updateSeatMap);

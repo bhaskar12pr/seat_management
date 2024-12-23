@@ -8,33 +8,48 @@
     <style>
         body {
             font-family: 'Arial', sans-serif;
-            background-color: #f4f4f4;
+            background: #2c2c2c; /* Light black background */
             margin: 0;
             padding: 0;
+            color: #fff;
         }
         .container {
             width: 80%;
             margin: auto;
             overflow: hidden;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
         h1, h2 {
             text-align: center;
             color: #333;
+            animation: fadeIn 1s ease-in-out;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
         }
-        .attendance-entry, .attendance-report {
+        .attendance-entry, .attendance-report, .seat-map {
             background: #fff;
             padding: 20px;
             margin: 20px 0;
             border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            animation: slideIn 0.5s ease-in-out;
+            transform: perspective(1000px) rotateX(0deg) rotateY(0deg);
+            transition: transform 0.3s ease;
+        }
+        .attendance-entry:hover, .attendance-report:hover, .seat-map:hover {
+            transform: perspective(1000px) rotateX(5deg) rotateY(5deg);
         }
         label {
             display: block;
             margin-bottom: 10px;
             font-weight: bold;
+            color: #333;
         }
         input[type="date"], input[type="radio"] {
             margin-bottom: 10px;
+            animation: fadeIn 1s ease-in-out;
         }
         button {
             display: inline-block;
@@ -46,14 +61,19 @@
             border-radius: 5px;
             cursor: pointer;
             margin-top: 10px;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
         button:hover {
             background-color: #0056b3;
+            transform: translateY(-2px);
         }
         table {
             width: 100%;
             border-collapse: collapse;
             margin: 20px 0;
+            animation: fadeIn 1s ease-in-out;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
         table, th, td {
             border: 1px solid #ddd;
@@ -61,6 +81,7 @@
         th, td {
             padding: 12px;
             text-align: left;
+            color: #333; /* Ensure text is visible */
         }
         th {
             background-color: #007BFF;
@@ -69,54 +90,147 @@
         tr:nth-child(even) {
             background-color: #f2f2f2;
         }
+        tr:nth-child(odd) {
+            background-color: #fff;
+        }
+        .seat-map {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start; /* Align items to the start (left) */
+        }
+        .seat-row {
+            display: flex;
+            margin-bottom: 10px;
+        }
+        .seat {
+            width: 40px;
+            height: 40px;
+            margin: 5px;
+            background-size: cover;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 5px;
+            cursor: pointer;
+            position: relative;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .seat:hover {
+            transform: scale(1.1) translateZ(10px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+        .seat-empty {
+            width: 40px;
+            height: 40px;
+            margin: 5px;
+        }
+        .seat-gap {
+            width: 20px; /* Adjust the gap width as needed */
+        }
+        .seat::before {
+            content: attr(data-seat-number);
+            position: absolute;
+            top: 0px;
+            left: 0px;
+            color: red; /* Set seat number color to red */
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .seat.default {
+            background-image: url('images/seat.png');
+        }
+        .seat.selected {
+            background-image: url('images/seat-selected.png');
+        }
+        .seat.taken {
+            background-image: url('images/seat-taken.png');
+            cursor: not-allowed;
+        }
+        .seat:hover::after {
+            content: attr(data-username);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #333;
+            color: #fff;
+            padding: 5px;
+            border-radius: 5px;
+            white-space: nowrap;
+            z-index: 10;
+        }
+        .flex-container {
+            display: flex;
+            justify-content: space-between;
+        }
+        .flex-item {
+            flex: 1;
+            margin: 10px;
+        }
+        .compact {
+            max-width: 300px;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes slideIn {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Mark Attendance</h1>
-        <div id="attendance-entries" class="attendance-entry">
-            <div class="attendance-entry">
-                <label for="attendance-start-date">Select Start Date:</label>
-                <input type="date" id="attendance-start-date" class="attendance-date">
-                <br>
-                <label for="attendance-end-date">Select End Date:</label>
-                <input type="date" id="attendance-end-date" class="attendance-date">
-                <br>
-                <label for="attendance-status">Select Status:</label>
-                <input type="radio" class="attendance-status" name="attendance-status" value="Present" checked>
-                <label for="present">Present</label>
-                <input type="radio" class="attendance-status" name="attendance-status" value="Absent">
-                <label for="absent">Absent</label>
-                <br>
-                <button onclick="markAttendance()">Mark Attendance</button>
+        <div class="flex-container">
+            <div id="attendance-entries" class="attendance-entry compact flex-item">
+                <h2>Mark Attendance</h2>
+                <div class="attendance-entry">
+                    <label for="attendance-start-date">Select Start Date:</label>
+                    <input type="date" id="attendance-start-date" class="attendance-date">
+                    <br>
+                    <label for="attendance-end-date">Select End Date:</label>
+                    <input type="date" id="attendance-end-date" class="attendance-date">
+                    <br>
+                    <label for="attendance-status">Select Status:</label>
+                    <input type="radio" class="attendance-status" name="attendance-status" value="Present" checked>
+                    <label for="present">Present</label>
+                    <input type="radio" class="attendance-status" name="attendance-status" value="Absent">
+                    <label for="absent">Absent</label>
+                    <br>
+                    <button onclick="markAttendance()">Mark Attendance</button>
+                </div>
             </div>
-        </div>
 
-        <h2>Your Attendance Report</h2>
-        <div class="attendance-report">
-            <table id="user-attendance-table">
-                <thead>
-                    <tr>
-                        <th>Date</th>
-                        <th>Entry Time</th>
-                        <th>Status</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- Attendance data will be inserted here -->
-                </tbody>
-            </table>
+            <div class="flex-item">
+                <h2>Office Seat Map</h2>
+                <div class="seat-map" id="seat-map">
+                    <!-- Seats will be generated here -->
+                </div>
+            </div>
+            <div class="flex-item">
+                <h2>Your Attendance Report</h2>
+                <div class="attendance-report">
+                    <table id="user-attendance-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Entry Time</th>
+                                <th>Status</th>
+                                <th>Seat</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Attendance data will be inserted here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
     <script src="js/attendance-scripts.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const username = sessionStorage.getItem('username');
-            if (username) {
-                document.title = `Attendance - ${username}`;
-            }
-        });
-    </script>
 </body>
 </html>
