@@ -4,7 +4,39 @@ document.addEventListener('DOMContentLoaded', () => {
     fetchRegisteredUsers();
     populateDateDropdown();
     generateAttendanceChart();
+    generateUserRegistrationChart();
 });
+
+function displayUsers() {
+    let registeredUsers = JSON.parse(localStorage.getItem('registeredUsers')) || [];
+    const tableBody = document.getElementById('user-table').getElementsByTagName('tbody')[0];
+    tableBody.innerHTML = ''; // Clear existing data
+
+    registeredUsers.forEach(user => {
+        const newRow = tableBody.insertRow();
+
+        const usernameCell = newRow.insertCell(0);
+        const emailCell = newRow.insertCell(1);
+        const departmentCell = newRow.insertCell(2);
+        const actionCell = newRow.insertCell(3);
+
+        usernameCell.textContent = user.username;
+        emailCell.textContent = user.email;
+        departmentCell.textContent = user.department;
+
+        const removeButton = document.createElement('button');
+        removeButton.textContent = 'Remove';
+        removeButton.onclick = () => removeUser(user.username);
+        actionCell.appendChild(removeButton);
+    });
+}
+
+function removeUser(username) {
+    let registeredUsers = JSON.parse(localStorage.getItem('registeredUsers')) || [];
+    registeredUsers = registeredUsers.filter(user => user.username !== username);
+    localStorage.setItem('registeredUsers', JSON.stringify(registeredUsers));
+    fetchRegisteredUsers();
+}
 
 function fetchAttendanceRecords() {
     let attendanceRecords = JSON.parse(localStorage.getItem('attendanceRecords')) || [];
@@ -23,28 +55,6 @@ function fetchAttendanceRecords() {
         usernameCell.textContent = record.username;
         statusCell.textContent = record.status;
         seatCell.textContent = record.seat;
-    });
-}
-
-function fetchRegisteredUsers() {
-    let registeredUsers = JSON.parse(localStorage.getItem('registeredUsers')) || [];
-    const tableBody = document.getElementById('registered-users-table').getElementsByTagName('tbody')[0];
-    tableBody.innerHTML = ''; // Clear existing data
-
-    registeredUsers.forEach(user => {
-        const newRow = tableBody.insertRow();
-
-        const usernameCell = newRow.insertCell(0);
-        const emailCell = newRow.insertCell(1);
-        const passwordCell = newRow.insertCell(2);
-        const departmentCell = newRow.insertCell(3);
-        const roleCell = newRow.insertCell(4);
-
-        usernameCell.textContent = user.username;
-        emailCell.textContent = user.email;
-        passwordCell.textContent = user.password;
-        departmentCell.textContent = user.department;
-        roleCell.textContent = user.role;
     });
 }
 
@@ -133,17 +143,32 @@ function updateSeatMap() {
     });
 }
 
-function removeUser(username) {
-    // Retrieve the registered users data from localStorage
+function fetchRegisteredUsers() {
     let registeredUsers = JSON.parse(localStorage.getItem('registeredUsers')) || [];
-    registeredUsers = registeredUsers.filter(user => user.username !== username);
+    const tableBody = document.getElementById('registered-users-table').getElementsByTagName('tbody')[0];
+    tableBody.innerHTML = ''; // Clear existing data
 
-    localStorage.setItem('registeredUsers', JSON.stringify(registeredUsers));
-    fetchRegisteredUsers(); // Refresh the registered users table
-}
+    registeredUsers.forEach(user => {
+        const newRow = tableBody.insertRow();
 
-function getUsernameFromSession() {
-    return sessionStorage.getItem('username'); // Retrieve the username from sessionStorage
+        const usernameCell = newRow.insertCell(0);
+        const emailCell = newRow.insertCell(1);
+        const passwordCell = newRow.insertCell(2);
+        const departmentCell = newRow.insertCell(3);
+        const roleCell = newRow.insertCell(4);
+        const actionCell = newRow.insertCell(5);
+
+        usernameCell.textContent = user.username;
+        emailCell.textContent = user.email;
+        passwordCell.textContent = user.password;
+        departmentCell.textContent = user.department;
+        roleCell.textContent = user.role;
+
+        const removeButton = document.createElement('button');
+        removeButton.textContent = 'Remove';
+        removeButton.onclick = () => removeUser(user.username);
+        actionCell.appendChild(removeButton);
+    });
 }
 
 function populateDateDropdown() {
@@ -199,6 +224,69 @@ function generateAttendanceChart() {
             labels: labels,
             datasets: [{
                 label: 'Number of People',
+                data: data,
+                backgroundColor: 'rgba(0, 123, 255, 0.5)',
+                borderColor: 'rgba(0, 123, 255, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                x: {
+                    beginAtZero: true
+                },
+                y: {
+                    beginAtZero: true
+                }
+            },
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'top'
+                },
+                tooltip: {
+                    enabled: true
+                }
+            }
+        }
+    });
+}
+
+function generateUserRegistrationChart() {
+    let registeredUsers = JSON.parse(localStorage.getItem('registeredUsers')) || [];
+    const ctx = document.getElementById('user-registration-chart').getContext('2d');
+
+    // Filter records for the last month
+    const lastMonth = new Date();
+    lastMonth.setMonth(lastMonth.getMonth() - 1);
+    const lastMonthYear = lastMonth.getFullYear();
+    const lastMonthMonth = lastMonth.getMonth();
+
+    const monthlyRecords = registeredUsers.filter(user => {
+        const registrationDate = new Date(user.registrationDate);
+        return registrationDate.getMonth() === lastMonthMonth && registrationDate.getFullYear() === lastMonthYear;
+    });
+
+    // Count the number of users registered per department
+    const departmentCounts = {};
+    monthlyRecords.forEach(user => {
+        const department = user.department;
+        if (!departmentCounts[department]) {
+            departmentCounts[department] = 0;
+        }
+        departmentCounts[department]++;
+    });
+
+    // Prepare data for the chart
+    const labels = Object.keys(departmentCounts).sort();
+    const data = labels.map(department => departmentCounts[department]);
+
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Number of Users',
                 data: data,
                 backgroundColor: 'rgba(0, 123, 255, 0.5)',
                 borderColor: 'rgba(0, 123, 255, 1)',
