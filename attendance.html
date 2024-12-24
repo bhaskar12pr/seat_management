@@ -15,7 +15,7 @@
             color: #fff;
         }
         .container {
-            width: 80%;
+            width: 90%;
             margin: auto;
             overflow: hidden;
             background: rgba(255, 255, 255, 0.9);
@@ -23,24 +23,54 @@
             border-radius: 10px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .header button {
+            padding: 5px 5px; /* Smaller padding */
+            font-size: 12px; /* Smaller font size */
+            color: #fff;
+            background-color: #007BFF;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 80px; /* Set the desired width */
+            text-align: center; /* Center the text */
+        }
+        .header button:hover {
+            background-color: #0056b3;
+            transform: translateY(-2px);
+        }
         h1, h2 {
             text-align: center;
             color: #333;
             animation: fadeIn 1s ease-in-out;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
         }
-        .attendance-entry, .attendance-report, .seat-map {
+        .flex-container {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+        .flex-item {
             background: #fff;
             padding: 20px;
-            margin: 20px 0;
+            margin: 10px;
             border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            flex: 1;
+            min-width: 300px;
             animation: slideIn 0.5s ease-in-out;
             transform: perspective(1000px) rotateX(0deg) rotateY(0deg);
             transition: transform 0.3s ease;
         }
-        .attendance-entry:hover, .attendance-report:hover, .seat-map:hover {
-            transform: perspective(1000px) rotateX(5deg) rotateY(5deg);
+        .flex-item:hover {
+            transform: perspective(1000px) rotateX(3deg) rotateY(3deg); /* Reduced rotation */
         }
         label {
             display: block;
@@ -48,13 +78,45 @@
             font-weight: bold;
             color: #333;
         }
-        input[type="date"], input[type="radio"] {
+        input[type="date"], input[type="radio"], input[type="text"], select {
+            width: 100%;
+            padding: 10px;
             margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
             animation: fadeIn 1s ease-in-out;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        input[type="date"]:focus, input[type="radio"]:focus, input[type="text"]:focus, select:focus {
+            border-color: #007BFF;
+            box-shadow: 0 0 8px rgba(0, 123, 255, 0.5);
+        }
+        .radio-group {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        .radio-group label {
+            flex: 1;
+            text-align: center;
+            background: #007BFF;
+            color: #fff;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .radio-group input[type="radio"] {
+            display: none;
+        }
+        .radio-group input[type="radio"]:checked + label {
+            background: #0056b3;
         }
         button {
             display: inline-block;
-            padding: 10px 20px;
+            width: 100%;
+            padding: 10px;
             font-size: 16px;
             color: #fff;
             background-color: #007BFF;
@@ -118,7 +180,7 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
         .seat:hover {
-            transform: scale(1.1) translateZ(10px);
+            transform: scale(1.05); /* Reduced scale */
             box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
         }
         .seat-empty {
@@ -161,50 +223,40 @@
             white-space: nowrap;
             z-index: 10;
         }
-        .flex-container {
-            display: flex;
-            justify-content: space-between;
-        }
-        .flex-item {
-            flex: 1;
-            margin: 10px;
-        }
-        .compact {
-            max-width: 300px;
-        }
         @keyframes fadeIn {
             from { opacity: 0; }
             to { opacity: 1; }
         }
         @keyframes slideIn {
-            from { transform: translateY(20px); opacity: 0; }
+            from { transform: translateY(10px); opacity: 0; }
             to { transform: translateY(0); opacity: 1; }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Mark Attendance</h1>
+        <div class="header">
+            <button onclick="window.location.href='index.html'">Home</button>
+            <h1>Attendance</h1>
+            <button onclick="logout()">Logout</button>
+        </div>
         <div class="flex-container">
-            <div id="attendance-entries" class="attendance-entry compact flex-item">
+            <div class="flex-item">
                 <h2>Mark Attendance</h2>
-                <div class="attendance-entry">
+                <div>
                     <label for="attendance-start-date">Select Start Date:</label>
-                    <input type="date" id="attendance-start-date" class="attendance-date">
-                    <br>
+                    <input type="date" id="attendance-start-date">
                     <label for="attendance-end-date">Select End Date:</label>
-                    <input type="date" id="attendance-end-date" class="attendance-date">
-                    <br>
-                    <label for="attendance-status">Select Status:</label>
-                    <input type="radio" class="attendance-status" name="attendance-status" value="Present" checked>
-                    <label for="present">Present</label>
-                    <input type="radio" class="attendance-status" name="attendance-status" value="MayBe">
-                    <label for="absent">MayBe</label>
-                    <br>
+                    <input type="date" id="attendance-end-date">
+                    <div class="radio-group">
+                        <input type="radio" id="present" name="attendance-status" value="present" checked>
+                        <label for="present">Present</label>
+                        <input type="radio" id="maybe" name="attendance-status" value="maybe">
+                        <label for="maybe">Maybe</label>
+                    </div>
                     <button onclick="markAttendance()">Mark Attendance</button>
                 </div>
             </div>
-
             <div class="flex-item">
                 <h2>Office Seat Map</h2>
                 <div class="seat-map" id="seat-map">
@@ -233,5 +285,30 @@
         </div>
     </div>
     <script src="js/attendance-scripts.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('attendance-start-date').value = today;
+            document.getElementById('attendance-end-date').value = today;
+            updateSeatMap(today);
+        });
+
+        function updateSeatMap(date) {
+            const attendanceRecords = JSON.parse(localStorage.getItem('attendanceRecords')) || [];
+            const seats = document.querySelectorAll('.seat');
+
+            seats.forEach(seat => {
+                seat.classList.remove('taken');
+                seat.classList.add('default');
+                seat.removeAttribute('data-username');
+                const record = attendanceRecords.find(record => record.date === date && record.seat === seat.getAttribute('data-seat-number'));
+                if (record) {
+                    seat.classList.remove('default');
+                    seat.classList.add('taken');
+                    seat.setAttribute('data-username', record.username);
+                }
+            });
+        }
+    </script>
 </body>
 </html>

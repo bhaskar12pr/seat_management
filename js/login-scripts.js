@@ -18,3 +18,14 @@ function loginUser(event) {
         alert('Invalid username or password');
     }
 }
+
+function getUsernameFromSession() {
+    return sessionStorage.getItem('username');
+}
+
+function logout() {
+    // Clear session data
+    sessionStorage.removeItem('username');
+    // Redirect to the login page
+    window.location.href = 'login.html';
+}
